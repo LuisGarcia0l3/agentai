@@ -10,11 +10,12 @@ LABEL description="Sistema de trading avanzado con agentes IA"
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_VERSION=18.18.0
 
 # Directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias del sistema
+# Instalar dependencias del sistema y Node.js
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
@@ -22,6 +23,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libta-lib-dev \
     pkg-config \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Instalar TA-Lib
@@ -43,8 +46,15 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar código fuente
 COPY . .
 
+# Instalar dependencias del frontend
+WORKDIR /app/frontend
+RUN npm install && npm run build
+
+# Volver al directorio principal
+WORKDIR /app
+
 # Crear directorios necesarios
-RUN mkdir -p logs data/storage
+RUN mkdir -p logs data/storage models
 
 # Crear usuario no-root
 RUN useradd -m -u 1000 trader && \
@@ -53,7 +63,11 @@ RUN useradd -m -u 1000 trader && \
 USER trader
 
 # Exponer puertos
-EXPOSE 8501 8000
+EXPOSE 8501 8000 3000
+
+# Script de inicio
+COPY --chown=trader:trader start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
 # Comando por defecto
-CMD ["python", "main.py"]
+CMD ["/app/start.sh"]

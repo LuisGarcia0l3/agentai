@@ -8,6 +8,7 @@ services:
     ports:
       - "8501:8501"  # Streamlit dashboard
       - "8000:8000"  # FastAPI
+      - "3000:3000"  # Frontend Vite
     environment:
       - ENVIRONMENT=development
       - TRADING_MODE=paper
@@ -15,26 +16,27 @@ services:
     volumes:
       - ./logs:/app/logs
       - ./data:/app/data
+      - ./.env:/app/.env
     depends_on:
-      - postgres
+      - mongodb
       - redis
     networks:
       - trading-network
     restart: unless-stopped
 
-  # Base de datos PostgreSQL
-  postgres:
-    image: postgres:15-alpine
-    container_name: trading-postgres
+  # Base de datos MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: trading-mongodb
     environment:
-      POSTGRES_DB: trading_db
-      POSTGRES_USER: trading_user
-      POSTGRES_PASSWORD: trading_pass
+      MONGO_INITDB_ROOT_USERNAME: trading_user
+      MONGO_INITDB_ROOT_PASSWORD: trading_pass
+      MONGO_INITDB_DATABASE: trading_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mongodb_data:/data/db
+      - ./mongodb/init.js:/docker-entrypoint-initdb.d/init.js:ro
     ports:
-      - "5432:5432"
+      - "27017:27017"
     networks:
       - trading-network
     restart: unless-stopped
@@ -101,7 +103,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  mongodb_data:
   redis_data:
   prometheus_data:
   grafana_data:
