@@ -88,7 +88,7 @@ app = FastAPI(
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React dev servers
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:12003", "http://localhost:12004"],  # React dev servers
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -535,15 +535,22 @@ async def websocket_trading_signals(websocket: WebSocket):
             # Obtener señales de trading actualizadas
             if trading_agent and trading_agent.state.is_running:
                 # Simular señal de trading (en implementación real vendría del agente)
+                import random
+                signals = ["buy", "sell", "hold"]
+                current_signal = random.choice(signals)
+                
                 signal_data = {
                     "type": "trading_signal",
-                    "signal": "HOLD",
-                    "strength": 0.5,
+                    "signal": current_signal,
+                    "action": current_signal,  # Para compatibilidad con frontend
+                    "strength": round(random.uniform(0.3, 0.9), 2),
+                    "price": 110000 + random.uniform(-1000, 1000),  # Precio simulado
                     "symbol": settings.DEFAULT_SYMBOL,
                     "timestamp": datetime.now().isoformat(),
+                    "reason": f"Señal {current_signal.upper()} basada en análisis técnico",
                     "indicators": {
-                        "rsi": 50.0,
-                        "macd": 0.0
+                        "rsi": round(random.uniform(20, 80), 1),
+                        "macd": round(random.uniform(-2, 2), 3)
                     }
                 }
                 await websocket.send_text(json.dumps(signal_data))

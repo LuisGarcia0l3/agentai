@@ -61,10 +61,10 @@ const TradingSignals: React.FC = () => {
           </div>
           <div className="mt-2">
             <p className="text-xs opacity-75">
-              ${latestSignal.price.toLocaleString()} • Fuerza: {(latestSignal.strength * 100).toFixed(0)}%
+              ${latestSignal.price?.toLocaleString() || 'N/A'} • Fuerza: {latestSignal.strength ? (latestSignal.strength * 100).toFixed(0) : '0'}%
             </p>
             <p className="text-xs mt-1 opacity-60">
-              {latestSignal.reason}
+              {latestSignal.reason || 'Sin razón especificada'}
             </p>
           </div>
         </motion.div>

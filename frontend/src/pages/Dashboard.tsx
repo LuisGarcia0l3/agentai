@@ -18,6 +18,7 @@ import { useMarketDataStore, useTradingSignalsStore, useAgentsStore, useDashboar
 import MarketChart from '../components/MarketChart';
 import TradingSignals from '../components/TradingSignals';
 import AgentStatus from '../components/AgentStatus';
+import ErrorBoundary from '../components/ErrorBoundary';
 import PortfolioSummary from '../components/PortfolioSummary';
 import toast from 'react-hot-toast';
 
@@ -71,7 +72,7 @@ const Dashboard: React.FC = () => {
     signalsWs.connect(
       'ws://localhost:8000/ws/signals',
       (data) => {
-        if (data.type === 'trading_signal') {
+        if (data.type === 'trading_signal' && data.action) {
           addSignal(data);
           toast.success(`Nueva señal: ${data.action.toUpperCase()}`);
         }
@@ -222,7 +223,9 @@ const Dashboard: React.FC = () => {
               </h3>
               <Target className="w-5 h-5 text-blue-500" />
             </div>
-            <TradingSignals />
+            <ErrorBoundary>
+              <TradingSignals />
+            </ErrorBoundary>
           </div>
 
           {/* Estado de agentes */}
