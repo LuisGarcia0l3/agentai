@@ -182,16 +182,34 @@ async def shutdown_event():
 # ENDPOINTS DE DATOS DE MERCADO
 # ============================================================================
 
+def convert_symbol_format(symbol: str) -> str:
+    """Convertir símbolo de formato BTCUSDT a BTC/USDT para CCXT."""
+    # Mapeo de símbolos comunes
+    symbol_map = {
+        "BTCUSDT": "BTC/USDT",
+        "ETHUSDT": "ETH/USDT", 
+        "ADAUSDT": "ADA/USDT",
+        "DOTUSDT": "DOT/USDT",
+        "LINKUSDT": "LINK/USDT",
+        "LTCUSDT": "LTC/USDT",
+        "XRPUSDT": "XRP/USDT",
+        "SOLUSDT": "SOL/USDT"
+    }
+    return symbol_map.get(symbol, symbol)
+
+
 @app.get("/api/market/ticker/{symbol}", response_model=MarketDataResponse)
 async def get_ticker(symbol: str):
     """Obtener ticker actual de un símbolo."""
     try:
-        ticker = await market_data_manager.get_ticker(symbol)
+        # Convertir formato del símbolo
+        ccxt_symbol = convert_symbol_format(symbol)
+        ticker = await market_data_manager.get_ticker(ccxt_symbol)
         if not ticker:
             raise HTTPException(status_code=404, detail="Símbolo no encontrado")
         
         return MarketDataResponse(
-            symbol=ticker.symbol,
+            symbol=symbol,  # Devolver el símbolo original
             price=ticker.price,
             change_24h=ticker.change_24h,
             volume=ticker.volume,
@@ -205,7 +223,9 @@ async def get_ticker(symbol: str):
 async def get_ohlcv(symbol: str, timeframe: str = "1h", limit: int = 100):
     """Obtener datos OHLCV."""
     try:
-        ohlcv_data = await market_data_manager.get_ohlcv(symbol, timeframe, limit)
+        # Convertir formato del símbolo
+        ccxt_symbol = convert_symbol_format(symbol)
+        ohlcv_data = await market_data_manager.get_ohlcv(ccxt_symbol, timeframe, limit)
         
         if not ohlcv_data:
             raise HTTPException(status_code=404, detail="No hay datos disponibles")
@@ -469,6 +489,73 @@ async def health_check():
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
+
+
+# ============================================================================
+# WEBSOCKET ENDPOINTS
+# ============================================================================
+
+@app.websocket("/ws/market/{symbol}")
+async def websocket_market_data(websocket: WebSocket, symbol: str):
+    """WebSocket para datos de mercado en tiempo real."""
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Obtener datos de mercado actualizados
+            if market_data_manager:
+                # Convertir formato del símbolo
+                ccxt_symbol = convert_symbol_format(symbol)
+                ticker = await market_data_manager.get_ticker(ccxt_symbol)
+                if ticker:
+                    await websocket.send_text(json.dumps({
+                        "type": "market_data",
+                        "symbol": symbol,  # Usar símbolo original
+                        "price": ticker.price,
+                        "change_24h": ticker.change_24h,
+                        "volume": ticker.volume,
+                        "timestamp": ticker.timestamp.isoformat()
+                    }))
+            
+            # Esperar antes de la siguiente actualización
+            await asyncio.sleep(1)
+            
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        trading_logger.logger.error(f"Error en WebSocket market data: {e}")
+        manager.disconnect(websocket)
+
+
+@app.websocket("/ws/signals")
+async def websocket_trading_signals(websocket: WebSocket):
+    """WebSocket para señales de trading en tiempo real."""
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Obtener señales de trading actualizadas
+            if trading_agent and trading_agent.state.is_running:
+                # Simular señal de trading (en implementación real vendría del agente)
+                signal_data = {
+                    "type": "trading_signal",
+                    "signal": "HOLD",
+                    "strength": 0.5,
+                    "symbol": settings.DEFAULT_SYMBOL,
+                    "timestamp": datetime.now().isoformat(),
+                    "indicators": {
+                        "rsi": 50.0,
+                        "macd": 0.0
+                    }
+                }
+                await websocket.send_text(json.dumps(signal_data))
+            
+            # Esperar antes de la siguiente actualización
+            await asyncio.sleep(5)
+            
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        trading_logger.logger.error(f"Error en WebSocket signals: {e}")
+        manager.disconnect(websocket)
 
 
 # ============================================================================

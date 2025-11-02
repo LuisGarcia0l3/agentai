@@ -7,6 +7,7 @@ Soporta Binance, Yahoo Finance, Alpaca y más.
 
 import asyncio
 import ccxt
+import ccxt.async_support as ccxt_async
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -58,9 +59,8 @@ class MarketDataManager:
         # Crear sesión HTTP
         self.session = aiohttp.ClientSession()
         
-        # Inicializar Binance
-        if settings.BINANCE_API_KEY:
-            await self._init_binance()
+        # Inicializar Binance (sin API keys para datos públicos)
+        await self._init_binance()
         
         # Inicializar otros exchanges según configuración
         trading_logger.logger.info("✅ Conexiones de datos inicializadas")
@@ -68,12 +68,9 @@ class MarketDataManager:
     async def _init_binance(self):
         """Inicializar conexión con Binance."""
         try:
-            config = settings.get_exchange_config("binance")
-            
-            self.exchanges["binance"] = ccxt.binance({
-                'apiKey': config.get('api_key'),
-                'secret': config.get('secret'),
-                'sandbox': config.get('testnet', True),
+            # Inicializar Binance sin API keys para datos públicos
+            self.exchanges["binance"] = ccxt_async.binance({
+                'sandbox': False,  # Usar datos reales
                 'enableRateLimit': True,
                 'options': {
                     'defaultType': 'spot'  # spot, margin, future
@@ -82,10 +79,11 @@ class MarketDataManager:
             
             # Verificar conexión
             await self.exchanges["binance"].load_markets()
-            trading_logger.logger.info("✅ Binance conectado correctamente")
+            trading_logger.logger.info("✅ Binance conectado correctamente (modo público)")
             
         except Exception as e:
             trading_logger.logger.error(f"❌ Error conectando Binance: {e}")
+            # Si falla Binance, no es crítico, usaremos Yahoo Finance
     
     async def get_ohlcv(
         self, 
@@ -131,21 +129,34 @@ class MarketDataManager:
                     )
                     for candle in ohlcv_data
                 ]
-            else:
-                # Usar Yahoo Finance como fallback
-                result = await self._get_yahoo_ohlcv(symbol, timeframe, limit)
+                
+                # Guardar en cache
+                self._cache_data(cache_key, result, ttl_minutes=5)
+                
+                trading_logger.logger.debug(
+                    f"📊 Obtenidos {len(result)} datos OHLCV para {symbol}"
+                )
+                
+                return result
+            
+        except Exception as e:
+            trading_logger.logger.error(f"❌ Error obteniendo OHLCV {symbol}: {e}")
+        
+        # Fallback a Yahoo Finance
+        try:
+            result = await self._get_yahoo_ohlcv(symbol, timeframe, limit)
             
             # Guardar en cache
             self._cache_data(cache_key, result, ttl_minutes=5)
             
             trading_logger.logger.debug(
-                f"📊 Obtenidos {len(result)} datos OHLCV para {symbol}"
+                f"📊 Obtenidos {len(result)} datos OHLCV para {symbol} (Yahoo Finance)"
             )
             
             return result
             
         except Exception as e:
-            trading_logger.logger.error(f"❌ Error obteniendo OHLCV {symbol}: {e}")
+            trading_logger.logger.error(f"❌ Error Yahoo Finance OHLCV {symbol}: {e}")
             return []
     
     async def _get_yahoo_ohlcv(
@@ -158,6 +169,12 @@ class MarketDataManager:
         try:
             # Convertir símbolo para Yahoo Finance
             yahoo_symbol = symbol.replace('/', '-')
+            
+            # Para crypto, usar formato específico
+            if 'USDT' in symbol:
+                # BTC/USDT -> BTC-USD
+                base = symbol.split('/')[0]
+                yahoo_symbol = f"{base}-USD"
             
             # Calcular período
             period_map = {
@@ -231,9 +248,57 @@ class MarketDataManager:
                 return result
             
         except Exception as e:
-            trading_logger.logger.error(f"❌ Error obteniendo ticker {symbol}: {e}")
+            trading_logger.logger.error(f"❌ Error obteniendo ticker {symbol} de {exchange}: {e}")
+        
+        # Fallback a Yahoo Finance
+        try:
+            return await self._get_yahoo_ticker(symbol)
+        except Exception as e:
+            trading_logger.logger.error(f"❌ Error obteniendo ticker {symbol} de Yahoo Finance: {e}")
         
         return None
+    
+    async def _get_yahoo_ticker(self, symbol: str) -> Optional[Ticker]:
+        """Obtener ticker de Yahoo Finance."""
+        try:
+            # Convertir símbolo para Yahoo Finance
+            yahoo_symbol = symbol.replace('/', '-')
+            
+            # Para crypto, usar formato específico
+            if 'USDT' in symbol:
+                # BTC/USDT -> BTC-USD
+                base = symbol.split('/')[0]
+                yahoo_symbol = f"{base}-USD"
+            
+            ticker = yf.Ticker(yahoo_symbol)
+            info = ticker.info
+            
+            if not info or 'regularMarketPrice' not in info:
+                return None
+            
+            current_price = info.get('regularMarketPrice', 0)
+            if current_price == 0:
+                return None
+            
+            result = Ticker(
+                symbol=symbol,
+                price=current_price,
+                bid=info.get('bid', current_price),
+                ask=info.get('ask', current_price),
+                volume=info.get('volume', 0),
+                change_24h=info.get('regularMarketChangePercent', 0),
+                timestamp=datetime.now()
+            )
+            
+            # Guardar en cache
+            cache_key = f"ticker_yahoo_{symbol}"
+            self._cache_data(cache_key, result, ttl_minutes=1)
+            
+            return result
+            
+        except Exception as e:
+            trading_logger.logger.error(f"❌ Error Yahoo Finance ticker {symbol}: {e}")
+            return None
     
     async def get_orderbook(
         self, 
