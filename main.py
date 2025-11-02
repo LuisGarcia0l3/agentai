@@ -18,7 +18,13 @@ from pathlib import Path
 from typing import Optional
 
 from utils.config.settings import settings
-from utils.logging.logger import setup_logging, trading_logger
+
+# Intentar importar logger avanzado, usar simple como fallback
+try:
+    from utils.logging.logger import setup_logging, trading_logger
+except ImportError:
+    print("⚠️ structlog no disponible, usando logger simple...")
+    from utils.logging.simple_logger import setup_logging, trading_logger
 from dashboard.streamlit_app.app import run_dashboard
 from agents.trading_agent.agent import TradingAgent
 from data.feeds.market_data import MarketDataManager
