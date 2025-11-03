@@ -28,7 +28,7 @@ class AlpacaBroker(BaseBroker):
         # Alpaca API credentials
         self.api_key = os.getenv('ALPACA_API_KEY')
         self.secret_key = os.getenv('ALPACA_SECRET_KEY')
-        self.base_url = os.getenv('ALPACA_BASE_URL', 'https://paper-api.alpaca.markets/v2')
+        self.base_url = os.getenv('ALPACA_BASE_URL', 'https://paper-api.alpaca.markets')
         
         if not self.api_key or not self.secret_key:
             raise ValueError("Alpaca API credentials not found in environment variables")
