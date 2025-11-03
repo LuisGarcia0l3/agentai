@@ -722,19 +722,6 @@ class TradingDashboard:
             help="Seleccionar estrategias a utilizar"
         )
         
-        # Configuración de notificaciones
-        st.markdown("### 📢 Notificaciones")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.checkbox("Notificaciones por Email", value=False)
-            st.text_input("Email de Notificaciones", placeholder="tu@email.com")
-        
-        with col2:
-            st.checkbox("Notificaciones por Telegram", value=False)
-            st.text_input("Token del Bot de Telegram", placeholder="123456:ABC-DEF...")
-        
         # Botones de acción
         st.markdown("### 🎛️ Acciones del Sistema")
         

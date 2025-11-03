@@ -11,12 +11,7 @@ const Settings: React.FC = () => {
     stopLossPercent: 0.02,
     takeProfitPercent: 0.04,
     agentUpdateInterval: 300,
-    riskLevel: 'medium',
-    notifications: {
-      email: true,
-      telegram: false,
-      discord: false
-    }
+    riskLevel: 'medium'
   });
 
   const handleSave = () => {
@@ -170,79 +165,8 @@ const Settings: React.FC = () => {
             </div>
           </div>
 
-          {/* Notificaciones */}
+          {/* Estado del Sistema */}
           <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Notificaciones
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">Email</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Recibir alertas por correo electrónico
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={settings.notifications.email}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        notifications: {...settings.notifications, email: e.target.checked}
-                      })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">Telegram</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Notificaciones vía Telegram Bot
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={settings.notifications.telegram}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        notifications: {...settings.notifications, telegram: e.target.checked}
-                      })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">Discord</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Alertas en canal de Discord
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={settings.notifications.discord}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        notifications: {...settings.notifications, discord: e.target.checked}
-                      })}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-              </div>
-            </div>
-
             {/* Estado del Sistema */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
