@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ChartBarIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
+ ArrowTrendingUpIcon, // Cambiado de TrendingUpIcon
+  ArrowTrendingDownIcon, // Cambiado de TrendingDownIcon
   ExclamationTriangleIcon,
   InformationCircleIcon,
   ArrowPathIcon,
@@ -130,13 +130,13 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({ symbol, onSymbolChange 
     }
   };
 
-  const getSignalIcon = (signal: string) => {
-    switch (signal) {
-      case 'buy': return <TrendingUpIcon className="h-4 w-4" />;
-      case 'sell': return <TrendingDownIcon className="h-4 w-4" />;
-      default: return <InformationCircleIcon className="h-4 w-4" />;
-    }
-  };
+ const getSignalIcon = (signal: string) => {
+  switch (signal) {
+    case 'buy': return <ArrowTrendingUpIcon className="h-4 w-4" />; // Actualizado aquí
+    case 'sell': return <ArrowTrendingDownIcon className="h-4 w-4" />; // Actualizado aquí
+    default: return <InformationCircleIcon className="h-4 w-4" />;
+  }
+};
 
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment) {
