@@ -33,9 +33,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       description: 'Vista general del sistema'
     },
     {
+      name: 'Trading',
+      href: '/trading',
+      icon: TrendingUp,
+      description: 'Centro de trading'
+    },
+    {
       name: 'Backtesting',
       href: '/backtesting',
-      icon: TrendingUp,
+      icon: Activity,
       description: 'Pruebas históricas'
     },
     {

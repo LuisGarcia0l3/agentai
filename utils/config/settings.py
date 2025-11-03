@@ -105,19 +105,18 @@ class Settings(BaseSettings):
     BACKTEST_INITIAL_CAPITAL: float = Field(default=10000.0, description="Capital inicial backtest")
     
     # =============================================================================
-    # NOTIFICACIONES
+    # MONGODB LOCAL
     # =============================================================================
     
-    TELEGRAM_BOT_TOKEN: Optional[str] = Field(default=None, description="Token del bot de Telegram")
-    TELEGRAM_CHAT_ID: Optional[str] = Field(default=None, description="Chat ID de Telegram")
-    DISCORD_WEBHOOK_URL: Optional[str] = Field(default=None, description="Webhook de Discord")
+    MONGODB_URL: str = Field(default="mongodb://localhost:27017", description="MongoDB URL")
+    MONGODB_DATABASE: str = Field(default="agentai_trading", description="MongoDB Database")
     
-    # Email
-    SMTP_HOST: str = Field(default="smtp.gmail.com", description="Host SMTP")
-    SMTP_PORT: int = Field(default=587, description="Puerto SMTP")
-    SMTP_USER: Optional[str] = Field(default=None, description="Usuario SMTP")
-    SMTP_PASSWORD: Optional[str] = Field(default=None, description="Password SMTP")
-    NOTIFICATION_EMAIL: Optional[str] = Field(default=None, description="Email de notificaciones")
+    # =============================================================================
+    # CONFIGURACIÓN LOCAL MAC M2
+    # =============================================================================
+    
+    USE_DOCKER: bool = Field(default=False, description="Usar Docker (opcional)")
+    LOCAL_DATA_PATH: str = Field(default="./data", description="Ruta local para datos")
     
     class Config:
         """Configuración de Pydantic."""
