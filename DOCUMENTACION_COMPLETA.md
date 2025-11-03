@@ -1835,10 +1835,9 @@ class DynamicStopLoss:
 
 #### 🔄 En Desarrollo (0%)
 1. **Base de Datos**: Persistencia avanzada (opcional)
-2. **Notificaciones**: Telegram, Discord, Email
-3. **Tests Unitarios**: Cobertura completa
-4. **Más Estrategias**: Bollinger Bands, Fibonacci
-5. **Machine Learning**: Modelos predictivos avanzados
+2. **Tests Unitarios**: Cobertura completa
+3. **Más Estrategias**: Bollinger Bands, Fibonacci
+4. **Machine Learning**: Modelos predictivos avanzados
 
 ### Métricas de Rendimiento
 
@@ -1950,35 +1949,7 @@ CREATE TABLE performance_metrics (
 );
 ```
 
-#### 3. Sistema de Notificaciones
-**Descripción**: Alertas multi-canal
-**Canales**:
-- Telegram Bot
-- Discord Webhook
-- Email SMTP
-- Push Notifications (PWA)
 
-**Implementación**:
-```python
-class NotificationManager:
-    def __init__(self):
-        self.telegram_bot = TelegramBot(settings.TELEGRAM_TOKEN)
-        self.discord_webhook = DiscordWebhook(settings.DISCORD_WEBHOOK)
-        self.email_client = SMTPClient(settings.SMTP_CONFIG)
-    
-    async def send_trading_alert(self, signal: TradingSignal):
-        message = f"🚨 {signal.signal.upper()} Signal\n"
-        message += f"Symbol: {signal.symbol}\n"
-        message += f"Price: ${signal.price:,.2f}\n"
-        message += f"Strength: {signal.strength:.1%}\n"
-        message += f"Reason: {signal.reason}"
-        
-        await asyncio.gather(
-            self.telegram_bot.send_message(message),
-            self.discord_webhook.send(message),
-            self.email_client.send_alert(message)
-        )
-```
 
 ### Prioridad Media (Importantes)
 
@@ -2320,14 +2291,6 @@ BINANCE_TESTNET=true
 
 # Database (opcional)
 DATABASE_URL=postgresql://user:password@localhost:5432/trading_db
-
-# Notifications (opcional)
-TELEGRAM_TOKEN=your_telegram_bot_token
-DISCORD_WEBHOOK=your_discord_webhook_url
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
 
 # Logging
 LOG_LEVEL=INFO

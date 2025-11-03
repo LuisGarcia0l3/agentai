@@ -510,7 +510,7 @@ services:
 - **Prometheus**: Métricas del sistema
 - **Grafana**: Dashboards visuales
 - **Logs estructurados**: JSON logging
-- **Alertas**: Telegram/Discord/Email
+- **Alertas**: Sistema de alertas interno
 
 ---
 

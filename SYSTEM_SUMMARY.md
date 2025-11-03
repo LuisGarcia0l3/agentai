@@ -80,10 +80,9 @@ ai-trading-system/
 9. **Testing**: Verificación de componentes principales
 
 ### ⏳ Pendientes (Opcionales)
-1. **Sistema de Notificaciones**: Telegram, Discord, Email
-2. **Más Estrategias**: RSI, MACD, Bollinger Bands específicas
-3. **Tests Unitarios**: Cobertura completa de testing
-4. **Base de Datos**: Persistencia avanzada (opcional)
+1. **Más Estrategias**: RSI, MACD, Bollinger Bands específicas
+2. **Tests Unitarios**: Cobertura completa de testing
+3. **Base de Datos**: Persistencia avanzada (opcional)
 
 ## 🚀 Cómo Usar el Sistema
 
@@ -165,12 +164,11 @@ streamlit run dashboard/streamlit_app/app.py
 
 ## 🔮 Próximos Pasos Sugeridos
 
-1. **Implementar Notificaciones**: Telegram, Discord, Email
-2. **Añadir Más Estrategias**: RSI, MACD, Bollinger Bands
-3. **Tests Unitarios**: Cobertura completa
-4. **Optimización**: Performance y escalabilidad
-5. **Deployment**: Docker y CI/CD
-6. **Monitoreo**: Métricas y alertas avanzadas
+1. **Añadir Más Estrategias**: RSI, MACD, Bollinger Bands
+2. **Tests Unitarios**: Cobertura completa
+3. **Optimización**: Performance y escalabilidad
+4. **Deployment**: Docker y CI/CD
+5. **Monitoreo**: Métricas y alertas avanzadas
 
 ## ⚠️ Consideraciones Importantes
 
